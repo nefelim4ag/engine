@@ -2472,6 +2472,8 @@ ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface.cc + ../
 ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface.h + ../../../flutter/LICENSE
 ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface_mock.cc + ../../../flutter/LICENSE
 ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface_mock.h + ../../../flutter/LICENSE
+ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface_transaction.cc + ../../../flutter/LICENSE
+ORIGIN: ../../../flutter/shell/platform/android/surface/android_surface_transaction.h + ../../../flutter/LICENSE
 ORIGIN: ../../../flutter/shell/platform/android/surface/snapshot_surface_producer.cc + ../../../flutter/LICENSE
 ORIGIN: ../../../flutter/shell/platform/android/surface/snapshot_surface_producer.h + ../../../flutter/LICENSE
 ORIGIN: ../../../flutter/shell/platform/android/vsync_waiter_android.cc + ../../../flutter/LICENSE
@@ -5166,6 +5168,8 @@ FILE: ../../../flutter/shell/platform/android/surface/android_surface.cc
 FILE: ../../../flutter/shell/platform/android/surface/android_surface.h
 FILE: ../../../flutter/shell/platform/android/surface/android_surface_mock.cc
 FILE: ../../../flutter/shell/platform/android/surface/android_surface_mock.h
+FILE: ../../../flutter/shell/platform/android/surface/android_surface_transaction.cc
+FILE: ../../../flutter/shell/platform/android/surface/android_surface_transaction.h
 FILE: ../../../flutter/shell/platform/android/surface/snapshot_surface_producer.cc
 FILE: ../../../flutter/shell/platform/android/surface/snapshot_surface_producer.h
 FILE: ../../../flutter/shell/platform/android/vsync_waiter_android.cc

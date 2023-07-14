@@ -12,13 +12,15 @@ AndroidExternalViewEmbedder::AndroidExternalViewEmbedder(
     const AndroidContext& android_context,
     std::shared_ptr<PlatformViewAndroidJNI> jni_facade,
     std::shared_ptr<AndroidSurfaceFactory> surface_factory,
-    const TaskRunners& task_runners)
+    const TaskRunners& task_runners,
+    AndroidSurfaceTransaction& android_surface_transaction)
     : ExternalViewEmbedder(),
       android_context_(android_context),
       jni_facade_(std::move(jni_facade)),
       surface_factory_(std::move(surface_factory)),
       surface_pool_(std::make_unique<SurfacePool>()),
-      task_runners_(task_runners) {}
+      task_runners_(task_runners),
+      android_surface_transaction_(android_surface_transaction) {}
 
 // |ExternalViewEmbedder|
 void AndroidExternalViewEmbedder::PrerollCompositeEmbeddedView(
@@ -71,6 +73,16 @@ void AndroidExternalViewEmbedder::SubmitFrame(
   if (!FrameHasPlatformLayers()) {
     frame->Submit();
     return;
+  }
+
+  auto submit_info = frame->submit_info();
+  int64_t vsync_id = submit_info.vsync_id;
+  if (vsync_id) {
+    // Steal the vsync_id so that the frame submission doesn't use it
+    submit_info.vsync_id = 0;
+    frame->set_submit_info(submit_info);
+    android_surface_transaction_.Begin();
+    android_surface_transaction_.SetVsyncId(vsync_id);
   }
 
   std::unordered_map<int64_t, SkRect> overlay_layers;
@@ -179,6 +191,10 @@ void AndroidExternalViewEmbedder::SubmitFrame(
     if (should_submit_current_frame) {
       frame->Submit();
     }
+  }
+
+  if (vsync_id) {
+    android_surface_transaction_.End();
   }
 }
 

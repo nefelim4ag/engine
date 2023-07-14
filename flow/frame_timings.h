@@ -49,10 +49,23 @@ class FrameTimingsRecorder {
   /// Timestamp of the vsync signal.
   fml::TimePoint GetVsyncStartTime() const;
 
-  /// Timestamp of when the frame was targeted to be presented.
+  /// Timestamp of the deadline for presenting the frame to the platform
+  /// compositor to avoid missing frames.
   ///
-  /// This is typically the next vsync signal timestamp.
+  /// This is often the next vsync signal timestamp, but may also be
+  /// before or after that time, depending on platform compositor scheduling.
   fml::TimePoint GetVsyncTargetTime() const;
+
+  /// Timestamp of when the next vsync signal will occur.
+  ///
+  /// A vsync signal will not occur at that time unless one is requested.
+  /// The purpose of this timestamp is to properly allocate the current frame
+  /// budget when multiple frames are in flight.
+  fml::TimePoint GetNextVsyncStartTime() const;
+
+  // Opaque identifier to pass to the platform compositor to help it present
+  // this frame at the correct time.
+  int64_t GetVsyncId() const;
 
   /// Timestamp of when the frame building started.
   fml::TimePoint GetBuildStartTime() const;
@@ -85,7 +98,10 @@ class FrameTimingsRecorder {
   size_t GetPictureCacheBytes() const;
 
   /// Records a vsync event.
-  void RecordVsync(fml::TimePoint vsync_start, fml::TimePoint vsync_target);
+  void RecordVsync(fml::TimePoint vsync_start,
+                   fml::TimePoint vsync_target,
+                   fml::TimePoint next_vsync_start,
+                   int64_t vsync_id);
 
   /// Records a build start event.
   void RecordBuildStart(fml::TimePoint build_start);
@@ -120,7 +136,9 @@ class FrameTimingsRecorder {
                   ThrowWhenRecordRasterBeforeBuildEnd);
 
   [[nodiscard]] fml::Status RecordVsyncImpl(fml::TimePoint vsync_start,
-                                            fml::TimePoint vsync_target);
+                                            fml::TimePoint vsync_target,
+                                            fml::TimePoint next_vsync_start,
+                                            int64_t vsync_id);
   [[nodiscard]] fml::Status RecordBuildStartImpl(fml::TimePoint build_start);
   [[nodiscard]] fml::Status RecordBuildEndImpl(fml::TimePoint build_end);
   [[nodiscard]] fml::Status RecordRasterStartImpl(fml::TimePoint raster_start);
@@ -135,6 +153,8 @@ class FrameTimingsRecorder {
 
   fml::TimePoint vsync_start_;
   fml::TimePoint vsync_target_;
+  fml::TimePoint next_vsync_start_;
+  int64_t vsync_id_;
   fml::TimePoint build_start_;
   fml::TimePoint build_end_;
   fml::TimePoint raster_start_;

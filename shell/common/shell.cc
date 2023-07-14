@@ -1945,7 +1945,7 @@ bool Shell::OnServiceProtocolRenderFrameWithRasterStats(
     // set before build-end.
     auto frame_timings_recorder = std::make_unique<FrameTimingsRecorder>();
     const auto now = fml::TimePoint::Now();
-    frame_timings_recorder->RecordVsync(now, now);
+    frame_timings_recorder->RecordVsync(now, now, now, 0);
     frame_timings_recorder->RecordBuildStart(now);
     frame_timings_recorder->RecordBuildEnd(now);
 

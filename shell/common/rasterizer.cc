@@ -613,6 +613,7 @@ RasterStatus Rasterizer::DrawToSurfaceUnsafe(
     // the past and might need to get snapped to future as this frame could
     // have been resubmitted. `presentation_time` on `submit_info` is not set
     // in this case.
+    submit_info.vsync_id = frame_timings_recorder.GetVsyncId();
     const auto presentation_time = frame_timings_recorder.GetVsyncTargetTime();
     if (presentation_time > fml::TimePoint::Now()) {
       submit_info.presentation_time = presentation_time;

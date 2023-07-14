@@ -11,10 +11,9 @@
 
 #include "flutter/fml/macros.h"
 #include "flutter/shell/common/vsync_waiter.h"
+#include "flutter/shell/platform/android/android_choreographer.h"
 
 namespace flutter {
-
-class AndroidChoreographer;
 
 class VsyncWaiterAndroid final : public VsyncWaiter {
  public:
@@ -28,7 +27,13 @@ class VsyncWaiterAndroid final : public VsyncWaiter {
   // |VsyncWaiter|
   void AwaitVSync() override;
 
-  static void OnVsyncFromNDK(int64_t frame_nanos, void* data);
+  void Loop();
+
+  static void OnVsyncFromNDK(int64_t vsync_nanos, void* data);
+
+  static void OnVsyncFromNDK33(
+      AndroidChoreographer::AChoreographerFrameCallbackData* callback_data,
+      void* data);
 
   static void OnVsyncFromJava(JNIEnv* env,
                               jclass jcaller,
@@ -36,15 +41,20 @@ class VsyncWaiterAndroid final : public VsyncWaiter {
                               jlong refreshPeriodNanos,
                               jlong java_baton);
 
-  static void ConsumePendingCallback(std::weak_ptr<VsyncWaiter>* weak_this,
-                                     fml::TimePoint frame_start_time,
-                                     fml::TimePoint frame_target_time);
+  static void ConsumePendingCallback(
+      std::weak_ptr<VsyncWaiterAndroid>* weak_this,
+      fml::TimePoint frame_start_time,
+      fml::TimePoint frame_target_time,
+      fml::TimePoint next_frame_start_time,
+      int64_t frame_vsync_id);
 
   static void OnUpdateRefreshRate(JNIEnv* env,
                                   jclass jcaller,
                                   jfloat refresh_rate);
 
-  const bool use_ndk_choreographer_;
+  const AndroidChoreographer::ChoreographerType choreographer_type_;
+  bool awaiting_;
+  bool looping_;
   FML_DISALLOW_COPY_AND_ASSIGN(VsyncWaiterAndroid);
 };
 

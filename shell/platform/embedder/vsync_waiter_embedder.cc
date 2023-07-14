@@ -42,7 +42,8 @@ bool VsyncWaiterEmbedder::OnEmbedderVsync(
         auto vsync_waiter = weak_waiter->lock();
         delete weak_waiter;
         if (vsync_waiter) {
-          vsync_waiter->FireCallback(frame_start_time, frame_target_time);
+          vsync_waiter->FireCallback(frame_start_time, frame_target_time,
+                                     frame_target_time, 0);
         }
       },
       frame_start_time);

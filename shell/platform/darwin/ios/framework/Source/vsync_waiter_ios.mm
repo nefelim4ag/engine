@@ -25,7 +25,8 @@ VsyncWaiterIOS::VsyncWaiterIOS(const flutter::TaskRunners& task_runners)
   auto callback = [this](std::unique_ptr<flutter::FrameTimingsRecorder> recorder) {
     const fml::TimePoint start_time = recorder->GetVsyncStartTime();
     const fml::TimePoint target_time = recorder->GetVsyncTargetTime();
-    FireCallback(start_time, target_time, true);
+    const fml::TimePoint next_start_time = recorder->GetNextVsyncStartTime();
+    FireCallback(start_time, target_time, next_start_time, 0, true);
   };
   client_ =
       fml::scoped_nsobject{[[VSyncClient alloc] initWithTaskRunner:task_runners_.GetUITaskRunner()
@@ -136,7 +137,7 @@ fml::scoped_nsobject<VSyncClient> VsyncWaiterIOS::GetVsyncClient() const {
 
   current_refresh_rate_ = round(1 / (frame_target_time - frame_start_time).ToSecondsF());
 
-  recorder->RecordVsync(frame_start_time, frame_target_time);
+  recorder->RecordVsync(frame_start_time, frame_target_time, frame_target_time, 0);
   if (_allowPauseAfterVsync) {
     display_link_.get().paused = YES;
   }

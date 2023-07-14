@@ -53,6 +53,7 @@ void VsyncWaiterFallback::AwaitVSync() {
       [frame_start_time, frame_target_time, weak_this]() {
         if (auto vsync_waiter = weak_this.lock()) {
           vsync_waiter->FireCallback(frame_start_time, frame_target_time,
+                                     frame_target_time, 0,
                                      !vsync_waiter->for_testing_);
         }
       },

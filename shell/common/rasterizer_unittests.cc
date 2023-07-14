@@ -94,10 +94,11 @@ TEST(RasterizerTest, create) {
 }
 
 static std::unique_ptr<FrameTimingsRecorder> CreateFinishedBuildRecorder(
-    fml::TimePoint timestamp) {
+    fml::TimePoint timestamp,
+    int64_t vsync_id = 0) {
   std::unique_ptr<FrameTimingsRecorder> recorder =
       std::make_unique<FrameTimingsRecorder>();
-  recorder->RecordVsync(timestamp, timestamp);
+  recorder->RecordVsync(timestamp, timestamp, timestamp, vsync_id);
   recorder->RecordBuildStart(timestamp);
   recorder->RecordBuildEnd(timestamp);
   return recorder;
@@ -1058,6 +1059,7 @@ TEST(RasterizerTest, presentationTimeSetWhenVsyncTargetInFuture) {
   const auto first_timestamp = fml::TimePoint::Now() + millis_16;
   auto second_timestamp = first_timestamp + millis_16;
   std::vector<fml::TimePoint> timestamps = {first_timestamp, second_timestamp};
+  std::vector<int64_t> vsync_ids = {1001, 1002};
 
   int frames_submitted = 0;
   fml::CountDownLatch submit_latch(2);
@@ -1072,10 +1074,12 @@ TEST(RasterizerTest, presentationTimeSetWhenVsyncTargetInFuture) {
             /*submit_callback=*/
             [&](const SurfaceFrame& frame, DlCanvas*) {
               const auto pres_time = *frame.submit_info().presentation_time;
+              const auto vsync_id = frame.submit_info().vsync_id;
               const auto diff = pres_time - first_timestamp;
               int num_frames_submitted = frames_submitted++;
               EXPECT_EQ(diff.ToMilliseconds(),
                         num_frames_submitted * millis_16.ToMilliseconds());
+              EXPECT_EQ(vsync_id, num_frames_submitted + 1000);
               submit_latch.CountDown();
               return true;
             },
@@ -1093,7 +1097,8 @@ TEST(RasterizerTest, presentationTimeSetWhenVsyncTargetInFuture) {
       auto layer_tree = std::make_unique<LayerTree>(
           /*config=*/LayerTree::Config(), /*frame_size=*/SkISize());
       auto layer_tree_item = std::make_unique<LayerTreeItem>(
-          std::move(layer_tree), CreateFinishedBuildRecorder(timestamps[i]),
+          std::move(layer_tree),
+          CreateFinishedBuildRecorder(timestamps[i], vsync_ids[i]),
           kDevicePixelRatio);
       PipelineProduceResult result =
           pipeline->Produce().Complete(std::move(layer_tree_item));

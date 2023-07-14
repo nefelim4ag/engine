@@ -99,7 +99,8 @@ void Animator::BeginFrame(
   FML_DCHECK(producer_continuation_);
   const fml::TimePoint frame_target_time =
       frame_timings_recorder_->GetVsyncTargetTime();
-  dart_frame_deadline_ = frame_target_time.ToEpochDelta();
+  dart_frame_deadline_ =
+      frame_timings_recorder_->GetNextVsyncStartTime().ToEpochDelta();
   uint64_t frame_number = frame_timings_recorder_->GetFrameNumber();
   delegate_.OnAnimatorBeginFrame(frame_target_time, frame_number);
 
@@ -137,7 +138,8 @@ void Animator::Render(std::unique_ptr<flutter::LayerTree> layer_tree,
     // Framework can directly call render with a built scene.
     frame_timings_recorder_ = std::make_unique<FrameTimingsRecorder>();
     const fml::TimePoint placeholder_time = fml::TimePoint::Now();
-    frame_timings_recorder_->RecordVsync(placeholder_time, placeholder_time);
+    frame_timings_recorder_->RecordVsync(placeholder_time, placeholder_time,
+                                         placeholder_time, 0);
     frame_timings_recorder_->RecordBuildStart(placeholder_time);
   }
 

@@ -80,6 +80,10 @@ class SurfaceFrame {
     // Time at which this frame is scheduled to be presented. This is a hint
     // that can be passed to the platform to drop queued frames.
     std::optional<fml::TimePoint> presentation_time;
+
+    // Identifier for the platform to indicate when this frame should be
+    // presented.
+    int64_t vsync_id = 0;
   };
 
   bool Submit();

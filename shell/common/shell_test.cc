@@ -150,7 +150,8 @@ void ShellTest::SetViewportMetrics(Shell* shell, double width, double height) {
               frame_begin_time + fml::TimeDelta::FromSecondsF(1.0 / 60.0);
           std::unique_ptr<FrameTimingsRecorder> recorder =
               std::make_unique<FrameTimingsRecorder>();
-          recorder->RecordVsync(frame_begin_time, frame_end_time);
+          recorder->RecordVsync(frame_begin_time, frame_end_time,
+                                frame_end_time, 0);
           engine->animator_->BeginFrame(std::move(recorder));
         }
         latch.Signal();
@@ -192,7 +193,8 @@ void ShellTest::PumpOneFrame(Shell* shell,
             frame_begin_time + fml::TimeDelta::FromSecondsF(1.0 / 60.0);
         std::unique_ptr<FrameTimingsRecorder> recorder =
             std::make_unique<FrameTimingsRecorder>();
-        recorder->RecordVsync(frame_begin_time, frame_end_time);
+        recorder->RecordVsync(frame_begin_time, frame_end_time, frame_end_time,
+                              0);
         engine->animator_->BeginFrame(std::move(recorder));
         latch.Signal();
       });
