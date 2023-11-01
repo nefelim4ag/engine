@@ -174,8 +174,6 @@ void TraceEvent4(TraceArg category_group,
   FlutterTimelineEvent(name,                            // label
                        gTimelineMicrosSource.load()(),  // timestamp0
                        0,              // timestamp1_or_async_id
-                       flow_id_count,  // flow_id_count
-                       reinterpret_cast<const int64_t*>(flow_ids),  // flow_ids
                        Dart_Timeline_Event_Begin,  // event type
                        4,                          // argument_count
                        arg_names,                  // argument_names
